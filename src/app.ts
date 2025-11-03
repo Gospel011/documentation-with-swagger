@@ -10,7 +10,7 @@ const options: OAS3Options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Docs with Swagger",
+      title: "Documentation with Swagger",
       version: packageJson.version,
       description:
         "This documentation serves as a showcase of how api documentation can be done with swagger ui and swagger jsdoc",
