@@ -34,6 +34,11 @@ const swaggerSpec = swaggerJSDoc(options);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1/user", userRouter);
 
+app.get("/api/docs/export", (req, res) => {
+  res.set("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`App is running successfully on port: ${PORT}`);
