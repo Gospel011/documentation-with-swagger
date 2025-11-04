@@ -26,7 +26,7 @@ const options: OAS3Options = {
       },
     },
   },
-  apis: ["./src/routes/*", "./src/models/*"],
+  apis: ["./src/routes/*", "./src/models/*", "./src/types/*", "./src/docs/*"],
 };
 
 const swaggerSpec = swaggerJSDoc(options);

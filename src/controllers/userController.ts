@@ -65,7 +65,6 @@ async function isLoggedIn(
       token,
       KEYS_FILE[jwtKid as KeysFileTypeKeyName]
     ) as JwtPayload;
-    console.log({ jwtKid, verifiedPayload });
 
     const users = await getUserDb();
     const user = users.find((el) => el.id == verifiedPayload.id);
@@ -117,7 +116,7 @@ function ensureRequestBodyHasFields(fieldsToAllow: string[]) {
     res: Response<ResponseBody>,
     next: NextFunction
   ) => {
-    const requestBodyKeys = Object.keys(req.body);
+    const requestBodyKeys = Object.keys(req.body ?? {});
 
     for (const key of fieldsToAllow) {
       if (!requestBodyKeys.includes(key))
@@ -261,12 +260,10 @@ async function deleteUserAccount(req: Request, res: Response<ResponseBody>) {
   const user = req.user!;
   const updatedUsers = (await getUserDb()).filter((el) => el.id != user.id);
   saveUsers(updatedUsers);
-  res
-    .status(200)
-    .json({
-      status: "success",
-      message: "Your account has been deleted successfully",
-    });
+  res.status(200).json({
+    status: "success",
+    message: "Your account has been deleted successfully",
+  });
 }
 
 export default {
@@ -277,5 +274,5 @@ export default {
   getProfile,
   getLoggedInUserProfile,
   updateUser,
-  deleteUserAccount
+  deleteUserAccount,
 };
