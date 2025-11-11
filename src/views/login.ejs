@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/scripts/toasts.js" defer></script>
+    <title>Docs</title>
+  </head>
+  <body>
+    <div class="toast-container" id="toast-container">
+      <div class="toast" id="toast">
+        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Temporibus cum
+        maxime aspernatur! Magnam nostrum vero tempora iste voluptatibus illum,
+      </div>
+    </div>
+    <form action="/api/docs/login">
+      <header>
+        <h1>Login</h1>
+        <p>Login to access the swagger documentation of our apis</p>
+      </header>
+      <div class="input-action-container">
+        <div class="inputs">
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Enter your email"
+          />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Enter your password"
+          />
+        </div>
+        <div class="row flex-end">
+          <a href="/api/docs/forgot-password">Forgot password</a>
+        </div>
+        <% if (status == 'failed' && typeof message !== 'undefined') { %>
+        <div class="error-container"><%= message %></div>
+        <% } %>
+      </div>
+      <button type="submit">Login</button>
+      <div class="row flex-center gap-2">
+        <span>Don't have a developer account?</span>
+        <a href="/api/docs/signup">Signup</a>
+      </div>
+    </form>
+  </body>
+</html>
