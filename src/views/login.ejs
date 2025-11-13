@@ -4,15 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/styles.css" />
-    <script src="/scripts/toasts.js" defer></script>
-    <title>Docs</title>
+    <link rel="stylesheet" href="/css/utils.css" />
+    <script src="/scripts/toasts.js" type="module" defer></script>
+    <title>Docs login</title>
   </head>
   <body>
     <div class="toast-container" id="toast-container">
-      <div class="toast" id="toast">
-        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Temporibus cum
-        maxime aspernatur! Magnam nostrum vero tempora iste voluptatibus illum,
-      </div>
+      <div class="toast" id="toast"></div>
     </div>
     <form action="/api/docs/login">
       <header>
@@ -26,6 +24,9 @@
             name="email"
             id="email"
             placeholder="Enter your email"
+            value="<% if (typeof email !== 'undefined') { %>
+              <%= email %>
+            <% } %>"
           />
           <input
             type="password"
@@ -34,17 +35,18 @@
             placeholder="Enter your password"
           />
         </div>
-        <div class="row flex-end">
+        <!-- <div class="row flex-end">
           <a href="/api/docs/forgot-password">Forgot password</a>
-        </div>
-        <% if (status == 'failed' && typeof message !== 'undefined') { %>
+        </div> -->
+        <% if (typeof status !== 'undefined' && status == 'failed' && typeof
+        message !== 'undefined') { %>
         <div class="error-container"><%= message %></div>
         <% } %>
       </div>
       <button type="submit">Login</button>
       <div class="row flex-center gap-2">
         <span>Don't have a developer account?</span>
-        <a href="/api/docs/signup">Signup</a>
+        <a href="/api/docs/sign-up">Create one</a>
       </div>
     </form>
   </body>

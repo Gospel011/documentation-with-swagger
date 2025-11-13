@@ -3,28 +3,32 @@ import fs from "fs/promises";
 import path from "path";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { getUserDb, saveUsers } from "db/users/users_db.js";
 const __dirname = import.meta.dirname;
 const userDbPath = path.join(__dirname, "../db/users.json");
 
-const users: User[] = [];
+// const users: User[] = [];
 
-async function getUserDb() {
-  const users: User[] = JSON.parse(await fs.readFile(userDbPath, "utf-8"));
-  return users;
-}
+// async function wait(time_in_milliseconds: number) {
+//   return await new Promise((resolve) =>
+//     setTimeout(resolve, time_in_milliseconds)
+//   );
+// }
 
-async function saveUsers(users: User[]) {
-  await fs.writeFile(userDbPath, JSON.stringify(users, null, 2));
-}
+export function verifyJwt(token: string) {
+  const jwtKid = jwt.decode(token, { complete: true })?.header.kid;
+  if (!jwtKid) {
+    return;
+  }
 
-async function wait(time_in_milliseconds: number) {
-  return await new Promise((resolve) =>
-    setTimeout(resolve, time_in_milliseconds)
-  );
-}
+  const KEYS_FILE: KeysFileType = getKeyStore();
 
-function verifyJwt(token: string) {
-  const decodedJson = jwt.decode(token);
+  const verifiedPayload = jwt.verify(
+    token,
+    KEYS_FILE[jwtKid as KeysFileTypeKeyName]
+  ) as JwtPayload;
+
+  return verifiedPayload;
 }
 
 async function isLoggedIn(
@@ -33,59 +37,83 @@ async function isLoggedIn(
   next: NextFunction
 ) {
   const authorization = req.headers.authorization;
-  if (!authorization) {
-    return res.status(401).json({
-      status: "failed",
-      message: "Please login to continue",
-    });
+  const cookieAuthToken = req.cookies.token;
+  const ssr = req.ssr;
+
+  if (!authorization && !cookieAuthToken) {
+    return ssr
+      ? res.redirect(
+          `/api/docs/login?${new URLSearchParams({
+            status: "failed",
+            message: "Please login to continue",
+          })}`
+        )
+      : res.status(401).json({
+          status: "failed",
+          message: "Please login to continue",
+        });
   }
-  const splitAuth: string[] = authorization
+  const splitAuth: string[] = `${
+    cookieAuthToken ? `Bearer ${cookieAuthToken}` : authorization
+  }`!
     .split("Bearer")
     .map((el) => el.trim());
   if (splitAuth.length != 2) {
-    return res.status(401).json({
-      status: "failed",
-      message: "Invalid auth",
-    });
+    return ssr
+      ? res.redirect(
+          `/api/docs/login?${new URLSearchParams({
+            status: "failed",
+            message: "Invalid auth",
+          })}`
+        )
+      : res.status(401).json({
+          status: "failed",
+          message: "Invalid auth",
+        });
   }
   const token: string = splitAuth[1]!;
 
   try {
-    const jwtKid = jwt.decode(token, { complete: true })?.header.kid;
-    if (!jwtKid) {
-      return res.status(401).json({
-        status: "failed",
-        message: "Invalid auth",
-      });
-    }
-
-    const KEYS_FILE: KeysFileType = getKeyStore();
-
-    const verifiedPayload = jwt.verify(
-      token,
-      KEYS_FILE[jwtKid as KeysFileTypeKeyName]
-    ) as JwtPayload;
+    const verifiedPayload = verifyJwt(token);
 
     const users = await getUserDb();
-    const user = users.find((el) => el.id == verifiedPayload.id);
+    const user = users.find((el) => el.id == verifiedPayload?.id);
 
     if (!user) {
-      return res.status(404).json({
-        status: "failed",
-        message: "This user does not exist",
-      });
+      return ssr
+        ? res.redirect(
+            `/api/docs/login?${new URLSearchParams({
+              status: "failed",
+              message:
+                "You are not allowed to access this documentation. Please create a developer account to continue",
+            })}`
+          )
+        : res.status(404).json({
+            status: "failed",
+            message: "This user does not exist",
+          });
     }
 
     req.user = user;
     next();
   } catch (error: any) {
-    res.status(403).json({
-      status: "failed",
-      message:
-        error.name == "TokenExpiredError"
-          ? "Please login to continue"
-          : "Invalid auth...",
-    });
+    ssr
+      ? res.redirect(
+          `/api/docs/login?${new URLSearchParams({
+            status: "failed",
+            message:
+              error.name == "TokenExpiredError"
+                ? "Please login to continue"
+                : "Invalid auth...",
+          })}`
+        )
+      : res.status(403).json({
+          status: "failed",
+          message:
+            error.name == "TokenExpiredError"
+              ? "Please login to continue"
+              : "Invalid auth...",
+        });
   }
 }
 
@@ -97,7 +125,7 @@ function getKeyStore() {
   return KEYS_FILE;
 }
 
-function signJwt(user: Partial<User>): string {
+export function signJwt(user: Partial<User>): string {
   if (!user.id) throw new Error("Invalid user data.");
   const KEYS_FILE: KeysFileType = getKeyStore();
   const token = jwt.sign(user, KEYS_FILE.key_1, {
@@ -149,8 +177,11 @@ async function createUser(
 
   const newUser: User = {
     ...user,
+    email: user?.email.trim().toLowerCase(),
     id: users.length + 1,
     password: hashedPassword,
+    role: "user",
+    status: "approved",
   };
   users.push(newUser);
   await saveUsers(users);

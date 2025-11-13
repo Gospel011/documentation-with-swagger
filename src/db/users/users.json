@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "firstName": "Aaron",
+    "lastName": "Divine",
+    "email": "aaron.divine@example.com",
+    "password": "$2b$10$KInC/8jyVJj5mniMB3ITUO.Urcv4Q6Et1UyCOT.nZfEXRyYZi9ul2",
+    "role": "developer",
+    "status": "approved"
+  },
+  {
+    "id": 2,
+    "firstName": "Test",
+    "lastName": "Example",
+    "email": "test.example@example.com",
+    "password": "$2b$10$WvrmJn60GO2VgTInTsENvuHPm8d8km06E3tnKPVSBGROYF9OAXEBy",
+    "role": "developer",
+    "status": "approved"
+  }
+]

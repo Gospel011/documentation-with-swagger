@@ -1,33 +1,13 @@
+import { toast } from "./utils/toast.js";
+
 function checkForMessage() {
   const searchParams = new URLSearchParams(window.location.search);
   const status = searchParams.get("status");
   const message = searchParams.get("message");
-  const toastContainer = document.getElementById("toast-container");
-  const toast = document.getElementById("toast");
-  let timeout;
-  let fadeInTimeout;
+  const d = searchParams.get("d");
 
-  if (!!message) {
-    toast.textContent = message;
-    fadeInTimeout = setTimeout(() => {
-      toastContainer.classList.toggle("fade-in-toast-container");
-      toastContainer.classList.toggle(
-        status == "failed" ? "toast-error" : "toast-success"
-      );
-    }, 0.5 & 1000);
-    timeout = setTimeout(() => {
-      toastContainer.classList.toggle("fade-in-toast-container");
-      toastContainer.classList.toggle(
-        status == "failed" ? "toast-error" : "toast-success"
-      );
-      // toastContainer.classList.toggle("toast-error");
-    }, 5 * 1000);
-  }
-
-  window.addEventListener("beforeunload", () => {
-    if (!!timeout) clearTimeout(timeout);
-    if (!!fadeInTimeout) clearTimeout(fadeInTimeout);
-  });
+  console.log({ status, message, d, isNaN: !!d && isNaN(d) });
+  toast(message, { status, duration: !(d * 1) ? 5 * 1000 : d * 1 });
 }
 
 checkForMessage();

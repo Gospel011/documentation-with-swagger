@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/utils.css" />
+    <script type="module" src="/scripts/toasts.js" defer></script>
+    <script type="module" src="/scripts/sign-up.js" defer></script>
+    <title>Create developer account</title>
+  </head>
+  <body>
+    <div class="toast-container" id="toast-container">
+      <div class="toast" id="toast"></div>
+    </div>
+    <form action="/api/docs/sign-up">
+      <header>
+        <h1>Create your dev account</h1>
+        <p>Let&apos;s quickly get you a developer account</p>
+      </header>
+      <div class="input-action-container">
+        <div class="inputs">
+          <div class="row gap-2">
+            <input
+              type="text"
+              name="firstName"
+              id="firstName"
+              placeholder="First name"
+              required
+            />
+            <input
+              type="text"
+              name="lastName"
+              id="lastName"
+              placeholder="Last name"
+              required
+            />
+          </div>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            placeholder="Enter your email"
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Enter your password"
+            required
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            id="confirmPassword"
+            placeholder="Confirm your password"
+            required
+          />
+        </div>
+        <% if (typeof status !== 'undefined' && status == 'failed' && typeof
+        message !== 'undefined') { %>
+        <div class="error-container"><%= message %></div>
+        <% } %>
+      </div>
+      <button type="submit">Create account</button>
+      <div class="row flex-center gap-2">
+        <span>Already have an account?</span>
+        <a href="/api/docs/signup">Login</a>
+      </div>
+    </form>
+  </body>
+</html>
